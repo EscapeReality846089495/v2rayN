@@ -159,7 +159,7 @@ namespace v2rayN.Handler
         }
 
 
-        public void UpdateSubscriptionProcess(Config config, Action<bool, string> update)
+        public void UpdateSubscriptionProcess(Config config, Action<bool, string> update, bool isSync=false)
         {
             _config = config;
             _updateFunc = update;
@@ -224,7 +224,14 @@ namespace v2rayN.Handler
                     _updateFunc(false, args.GetException().Message);
                 };
 
-                downloadHandle3.WebDownloadString(url);
+                if (isSync)
+                {
+                    downloadHandle3.SyncWebDownloadString(url);
+                }
+                else
+                {
+                    downloadHandle3.WebDownloadString(url);
+                }
                 _updateFunc(false, $"{hashCode}{UIRes.I18N("MsgStartGettingSubscriptions")}");
             }
 

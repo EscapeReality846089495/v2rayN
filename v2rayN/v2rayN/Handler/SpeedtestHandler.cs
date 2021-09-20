@@ -21,33 +21,36 @@ namespace v2rayN.Handler
             _config = config;
         }
 
-        public SpeedtestHandler(ref Config config, ref V2rayHandler v2rayHandler, List<int> selecteds, string actionType, Action<int, string> update)
+        public SpeedtestHandler(ref Config config, ref V2rayHandler v2rayHandler, List<int> selecteds, string actionType, Action<int, string> update, bool isSync=false)
         {
             _config = config;
             _v2rayHandler = v2rayHandler;
             _selecteds = Utils.DeepCopy(selecteds);
             _updateFunc = update;
+            Task task = null;
 
             if (actionType == "ping")
             {
-                Task.Run(() => RunPing());
+                task = Task.Run(() => RunPing());
             }
             if (actionType == "tcping")
             {
-                Task.Run(() => RunTcping());
+                task = Task.Run(() => RunTcping());
             }
             else if (actionType == "realping")
             {
-                Task.Run(() => RunRealPing());
+                task = Task.Run(() => RunRealPing());
             }
             else if (actionType == "realAVG")
             {
-                Task.Run(() => RunRealAVGPing());
+                task = Task.Run(() => RunRealAVGPing());
             }
             else if (actionType == "speedtest")
             {
-                Task.Run(() => RunSpeedTest());
+                task = Task.Run(() => RunSpeedTest());
             }
+            if (isSync)
+                Task.WaitAll(task);
         }
 
         private void RunPingSub(Action<int> updateFun)
@@ -155,7 +158,7 @@ namespace v2rayN.Handler
             try
             {
                 string msg = string.Empty;
-
+                
                 pid = _v2rayHandler.LoadV2rayConfigString(_config, _selecteds);
                 if (pid < 0)
                 {

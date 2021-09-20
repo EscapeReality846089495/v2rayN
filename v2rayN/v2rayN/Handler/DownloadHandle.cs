@@ -148,6 +148,27 @@ namespace v2rayN.Handler
             }
         }
 
+        /// <summary>
+        /// DownloadString
+        /// </summary> 
+        /// <param name="url"></param>
+        public void SyncWebDownloadString(string url)
+        {
+            string source = string.Empty;
+            try
+            {
+                Utils.SetSecurityProtocol();
+
+                WebClientEx ws = new WebClientEx();
+                source = ws.DownloadString(new Uri(url));
+                UpdateCompleted?.Invoke(this, new ResultEventArgs(true, source));
+            }
+            catch (Exception ex)
+            {
+                Utils.SaveLog(ex.Message, ex);
+            }
+        }
+
         private void Ws_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             try

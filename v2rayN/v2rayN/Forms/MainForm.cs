@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace v2rayN.Forms
 {
@@ -21,6 +22,8 @@ namespace v2rayN.Forms
         private List<int> lvSelecteds = new List<int>();
         private StatisticsHandler statistics = null;
         private string MsgFilter = string.Empty;
+        Func<int, int> sds; // 设置活动服务器的委托
+        Action<int, string> str; // 设置测试结果的委托
 
         #region Window 事件
 
@@ -37,6 +40,8 @@ namespace v2rayN.Forms
             {
                 MyAppExit(false);
             };
+            sds = SetDefaultServer;
+            str = SetTestResult;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -316,7 +321,7 @@ namespace v2rayN.Forms
             {
                 ToolStripItem ts = (ToolStripItem)sender;
                 int index = Utils.ToInt(ts.Tag);
-                SetDefaultServer(index);
+                Invoke(sds, index);
             }
             catch
             {
@@ -617,7 +622,7 @@ namespace v2rayN.Forms
             {
                 return;
             }
-            SetDefaultServer(index);
+            Invoke(sds, index);
         }
 
 
@@ -673,6 +678,17 @@ namespace v2rayN.Forms
             if (GetLvSelectedIndex() < 0) return;
             ClearTestResult();
             SpeedtestHandler statistics = new SpeedtestHandler(ref config, ref v2rayHandler, lvSelecteds, actionType, UpdateSpeedtestHandler);
+        }
+
+        private void SpeedtestAll(string actionType)
+        {
+            ClearTestResult();
+            List<int> idxes = new List<int>(config.vmess.Count);  // 构造全部服务器的索引数组
+            for (int i = 0; i < config.vmess.Count; i++)
+            {
+                idxes.Add(i);
+            }
+            SpeedtestHandler statistics = new SpeedtestHandler(ref config, ref v2rayHandler, idxes, actionType, UpdateSpeedtestHandler, true);
         }
 
         private void tsbTestMe_Click(object sender, EventArgs e)
@@ -1055,14 +1071,14 @@ namespace v2rayN.Forms
         {
             foreach (int s in lvSelecteds)
             {
-                SetTestResult(s, "");
+                Invoke(str, s, "");
             }
         }
         private void UpdateSpeedtestHandler(int index, string msg)
         {
             lvServers.Invoke((MethodInvoker)delegate
             {
-                SetTestResult(index, msg);
+                Invoke(str, index, msg);
             });
         }
 
@@ -1335,10 +1351,41 @@ namespace v2rayN.Forms
             UpdateSubscriptionProcess();
         }
 
+        private void tsbItlSubUpdate_Click(object sender, EventArgs e)
+        {
+            Task.Run(() => {
+                // 更新订阅
+                UpdateSubscriptionProcess(true);
+                // 全体测速
+                SpeedtestAll("realAVG");
+                // 找到最快的节点
+                int idx = -1;
+                int val = 0;
+                for (int i = 0; i < config.vmess.Count; i++)
+                {
+                    try
+                    {
+                        int tmp = int.Parse(config.vmess[i].testResult.Trim().Replace("ms", ""));
+                        if (idx < 0 || val > tmp)
+                        {
+                            val = tmp;
+                            idx = i;
+                        }
+                    } catch (FormatException)
+                    {
+                        continue;
+                    }
+                }
+                if (idx < 0) return;
+                // 让主线程选中节点
+                Invoke(sds, idx);
+            });
+        }
+
         /// <summary>
         /// the subscription update process
         /// </summary>
-        private void UpdateSubscriptionProcess()
+        private void UpdateSubscriptionProcess(bool isSync=false)
         {
             void _updateUI(bool success, string msg)
             {
@@ -1348,8 +1395,7 @@ namespace v2rayN.Forms
                     RefreshServers();
                 }
             };
-
-            (new UpdateHandle()).UpdateSubscriptionProcess(config, _updateUI);
+            (new UpdateHandle()).UpdateSubscriptionProcess(config, _updateUI, isSync);
         }
 
         private void tsbQRCodeSwitch_CheckedChanged(object sender, EventArgs e)

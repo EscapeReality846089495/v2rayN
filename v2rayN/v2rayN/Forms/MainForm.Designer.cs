@@ -108,6 +108,7 @@
             this.tsbSub = new System.Windows.Forms.ToolStripDropDownButton();
             this.tsbSubSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.tsbSubUpdate = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsbItlSubUpdate = new System.Windows.Forms.ToolStripMenuItem();
             this.tsbQRCodeSwitch = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbSetting = new System.Windows.Forms.ToolStripDropDownButton();
@@ -718,7 +719,8 @@
             resources.ApplyResources(this.tsbSub, "tsbSub");
             this.tsbSub.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbSubSetting,
-            this.tsbSubUpdate});
+            this.tsbSubUpdate,
+            this.tsbItlSubUpdate});
             this.tsbSub.Image = global::v2rayN.Properties.Resources.sub;
             this.tsbSub.Name = "tsbSub";
             // 
@@ -733,6 +735,12 @@
             resources.ApplyResources(this.tsbSubUpdate, "tsbSubUpdate");
             this.tsbSubUpdate.Name = "tsbSubUpdate";
             this.tsbSubUpdate.Click += new System.EventHandler(this.tsbSubUpdate_Click);
+            // 
+            // tsbItlSubUpdate
+            // 
+            resources.ApplyResources(this.tsbItlSubUpdate, "tsbItlSubUpdate");
+            this.tsbItlSubUpdate.Name = "tsbItlSubUpdate";
+            this.tsbItlSubUpdate.Click += new System.EventHandler(this.tsbItlSubUpdate_Click);
             // 
             // tsbQRCodeSwitch
             // 
@@ -1008,6 +1016,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.ToolStripMenuItem tsbSubSetting;
         private System.Windows.Forms.ToolStripMenuItem tsbSubUpdate;
+        private System.Windows.Forms.ToolStripMenuItem tsbItlSubUpdate;
         private System.Windows.Forms.ToolStripMenuItem menuSelectAll;
         private System.Windows.Forms.ToolStripMenuItem menuExport2SubContent;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
