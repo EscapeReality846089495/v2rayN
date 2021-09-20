@@ -40,6 +40,10 @@ namespace v2rayN.Handler
             {
                 Task.Run(() => RunRealPing());
             }
+            else if (actionType == "realAVG")
+            {
+                Task.Run(() => RunRealAVGPing());
+            }
             else if (actionType == "speedtest")
             {
                 Task.Run(() => RunSpeedTest());
@@ -123,6 +127,59 @@ namespace v2rayN.Handler
                             WebProxy webProxy = new WebProxy(Global.Loopback, httpPort + itemIndex);
                             int responseTime = -1;
                             string status = GetRealPingTime(_config.speedPingTestUrl, webProxy, out responseTime);
+                            string output = Utils.IsNullOrEmpty(status) ? FormatOut(responseTime, "ms") : FormatOut(status, "");
+                            _updateFunc(itemIndex, output);
+                        }
+                        catch (Exception ex)
+                        {
+                            Utils.SaveLog(ex.Message, ex);
+                        }
+                    }));
+                    //Thread.Sleep(100);
+                }
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch (Exception ex)
+            {
+                Utils.SaveLog(ex.Message, ex);
+            }
+            finally
+            {
+                if (pid > 0) _v2rayHandler.V2rayStopPid(pid);
+            }
+        }
+
+        private void RunRealAVGPing()
+        {
+            int pid = -1;
+            try
+            {
+                string msg = string.Empty;
+
+                pid = _v2rayHandler.LoadV2rayConfigString(_config, _selecteds);
+                if (pid < 0)
+                {
+                    _updateFunc(_selecteds[0], UIRes.I18N("OperationFailed"));
+                    return;
+                }
+
+                //Thread.Sleep(5000);
+                int httpPort = _config.GetLocalPort("speedtest");
+                // 多线程操作
+                List<Task> tasks = new List<Task>();
+                foreach (int itemIndex in _selecteds)
+                {
+                    if (_config.vmess[itemIndex].configType == (int)EConfigType.Custom)
+                    {
+                        continue;
+                    }
+                    tasks.Add(Task.Run(() =>
+                    {
+                        try
+                        {
+                            WebProxy webProxy = new WebProxy(Global.Loopback, httpPort + itemIndex);
+                            int responseTime = -1;
+                            string status = GetRealAVGPingTime(_config.speedPingTestUrl, webProxy, out responseTime);
                             string output = Utils.IsNullOrEmpty(status) ? FormatOut(responseTime, "ms") : FormatOut(status, "");
                             _updateFunc(itemIndex, output);
                         }
@@ -289,6 +346,52 @@ namespace v2rayN.Handler
                 responseTime = timer.Elapsed.Milliseconds;
 
                 myHttpWebResponse.Close();
+            }
+            catch (Exception ex)
+            {
+                Utils.SaveLog(ex.Message, ex);
+                msg = ex.Message;
+            }
+            return msg;
+        }
+
+        private string GetRealAVGPingTime(string url, WebProxy webProxy, out int responseTime)
+        {
+            string msg = string.Empty;
+            responseTime = -1;
+            List<int> rts = new List<int>(); // 记录TOTAL内的测速记录
+            const int TOTAL = 5;
+            try
+            {
+                for (int i = 0; i < TOTAL; i++)
+                {
+                    HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+                    myHttpWebRequest.Timeout = 5000; // 初始设置为5000
+                    myHttpWebRequest.Proxy = webProxy;//new WebProxy(Global.Loopback, Global.httpPort);
+
+                    Stopwatch timer = new Stopwatch();
+                    timer.Start();
+
+                    HttpWebResponse myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
+                    if (myHttpWebResponse.StatusCode != HttpStatusCode.OK
+                        && myHttpWebResponse.StatusCode != HttpStatusCode.NoContent)
+                    {
+                        msg = myHttpWebResponse.StatusDescription;
+                    }
+                    timer.Stop();
+                    rts.Add(timer.Elapsed.Milliseconds);
+
+                    myHttpWebResponse.Close();
+                }
+                rts.Sort();  // 测速记录排序
+                for (int i = 0; i < TOTAL; i++)
+                {
+                    // 去掉最高分和最低分
+                    if (i == 0 || i == TOTAL) continue;
+                    responseTime += rts[i];
+                }
+                responseTime++;  // 初始值为-1，因此需要额外+1
+                responseTime /= TOTAL - 2; // 取平均
             }
             catch (Exception ex)
             {

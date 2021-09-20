@@ -515,6 +515,9 @@ namespace v2rayN.Forms
                     case Keys.R:
                         menuRealPingServer_Click(null, null);
                         break;
+                    case Keys.X:
+                        menuRealAVGPingServer_Click(null, null);
+                        break;
                     case Keys.S:
                         menuScanScreen_Click(null, null);
                         break;
@@ -638,6 +641,19 @@ namespace v2rayN.Forms
             //UI.Show(UIRes.I18N("SpeedServerTips"));
 
             Speedtest("realping");
+        }
+
+        private void menuRealAVGPingServer_Click(object sender, EventArgs e)
+        {
+            //if (!config.sysAgentEnabled)
+            //{
+            //    UI.Show(UIRes.I18N("NeedHttpGlobalProxy"));
+            //    return;
+            //}
+
+            //UI.Show(UIRes.I18N("SpeedServerTips"));
+
+            Speedtest("realAVG");
         }
 
         private void menuSpeedServer_Click(object sender, EventArgs e)

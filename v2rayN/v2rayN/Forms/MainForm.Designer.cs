@@ -56,6 +56,7 @@
             this.menuPingServer = new System.Windows.Forms.ToolStripMenuItem();
             this.menuTcpingServer = new System.Windows.Forms.ToolStripMenuItem();
             this.menuRealPingServer = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuRealAVGPingServer = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSpeedServer = new System.Windows.Forms.ToolStripMenuItem();
             this.tsbTestMe = new System.Windows.Forms.ToolStripMenuItem();
             this.menuClearServerStatistics = new System.Windows.Forms.ToolStripMenuItem();
@@ -216,6 +217,7 @@
             this.menuPingServer,
             this.menuTcpingServer,
             this.menuRealPingServer,
+            this.menuRealAVGPingServer,
             this.menuSpeedServer,
             this.tsbTestMe,
             this.menuClearServerStatistics,
@@ -361,6 +363,13 @@
             resources.ApplyResources(this.menuRealPingServer, "menuRealPingServer");
             this.menuRealPingServer.Name = "menuRealPingServer";
             this.menuRealPingServer.Click += new System.EventHandler(this.menuRealPingServer_Click);
+            // 
+            // menuRealAVGPingServer
+            // 
+            resources.ApplyResources(this.menuRealAVGPingServer, "menuRealAVGPingServer");
+            this.menuRealAVGPingServer.Name = "menuRealAVGPingServer";
+            // TODO 添加click方法
+            this.menuRealAVGPingServer.Click += new System.EventHandler(this.menuRealAVGPingServer_Click);
             // 
             // menuSpeedServer
             // 
@@ -1019,6 +1028,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuRemoveDuplicateServer;
         private System.Windows.Forms.ToolStripMenuItem menuTcpingServer;
         private System.Windows.Forms.ToolStripMenuItem menuRealPingServer;
+        private System.Windows.Forms.ToolStripMenuItem menuRealAVGPingServer;
         private System.Windows.Forms.ToolStripMenuItem menuUpdateSubscriptions;
         private System.Windows.Forms.ToolStripMenuItem tsbV2rayWebsite;
         private System.Windows.Forms.ToolStripMenuItem menuKeepNothing;
