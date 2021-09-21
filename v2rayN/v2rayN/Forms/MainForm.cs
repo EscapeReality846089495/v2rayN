@@ -1356,30 +1356,43 @@ namespace v2rayN.Forms
             Task.Run(() => {
                 // 更新订阅
                 UpdateSubscriptionProcess(true);
-                // 全体测速
-                SpeedtestAll("realAVG");
-                // 找到最快的节点
-                int idx = -1;
-                int val = 0;
-                for (int i = 0; i < config.vmess.Count; i++)
+                TestAndSelect();
+            });
+        }
+
+        private void tsbItlSelect_Click(object sender, EventArgs e)
+        {
+            Task.Run(() => {
+                TestAndSelect();
+            });
+        }
+
+        private void TestAndSelect()
+        {
+            // 全体测速
+            SpeedtestAll("realAVG");
+            // 找到最快的节点
+            int idx = -1;
+            int val = 0;
+            for (int i = 0; i < config.vmess.Count; i++)
+            {
+                try
                 {
-                    try
+                    int tmp = int.Parse(config.vmess[i].testResult.Trim().Replace("ms", ""));
+                    if (idx < 0 || val > tmp)
                     {
-                        int tmp = int.Parse(config.vmess[i].testResult.Trim().Replace("ms", ""));
-                        if (idx < 0 || val > tmp)
-                        {
-                            val = tmp;
-                            idx = i;
-                        }
-                    } catch (FormatException)
-                    {
-                        continue;
+                        val = tmp;
+                        idx = i;
                     }
                 }
-                if (idx < 0) return;
-                // 让主线程选中节点
-                Invoke(sds, idx);
-            });
+                catch (FormatException)
+                {
+                    continue;
+                }
+            }
+            if (idx < 0) return;
+            // 让主线程选中节点
+            Invoke(sds, idx);
         }
 
         /// <summary>

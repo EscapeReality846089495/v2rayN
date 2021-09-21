@@ -453,6 +453,12 @@
   <data name="tsbItlSubUpdate.Text" xml:space="preserve">
     <value>智能更新</value>
   </data>
+  <data name="tsbItlSelect.Size" type="System.Drawing.Size, System.Drawing">
+    <value>124, 22</value>
+  </data>
+  <data name="tsbItlSelect.Text" xml:space="preserve">
+    <value>智能选择</value>
+  </data>
   <data name="tsbSub.Size" type="System.Drawing.Size, System.Drawing">
     <value>61, 53</value>
   </data>
