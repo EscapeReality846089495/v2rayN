@@ -48,6 +48,7 @@ namespace v2rayN.Forms
         {
             ConfigHandler.LoadConfig(ref config);
             ConfigHandler.InitBuiltinRouting(ref config);
+            MainFormHandler.Instance.BackupGuiNConfig(config, true);
             v2rayHandler = new V2rayHandler();
             v2rayHandler.ProcessEvent += v2rayHandler_ProcessEvent;
 
@@ -961,7 +962,7 @@ namespace v2rayN.Forms
             {
                 if (!Utils.IsNullOrEmpty(MsgFilter))
                 {
-                    if (!Regex.IsMatch(text,MsgFilter))
+                    if (!Regex.IsMatch(text, MsgFilter))
                     {
                         return;
                     }
