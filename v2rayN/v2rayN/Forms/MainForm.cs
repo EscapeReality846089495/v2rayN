@@ -586,13 +586,11 @@ namespace v2rayN.Forms
             {
                 return;
             }
-            for (int k = lvSelecteds.Count - 1; k >= 0; k--)
-            {
-                ConfigHandler.RemoveServer(ref config, lvSelecteds[k]);
-            }
+
+            ConfigHandler.RemoveServer(ref config, lvSelecteds);
+
             RefreshServers();
             LoadV2ray();
-
         }
 
         private void menuRemoveDuplicateServer_Click(object sender, EventArgs e)
