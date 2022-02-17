@@ -234,7 +234,7 @@ namespace v2rayN.Handler
                 }
                 else
                 {
-                    downloadHandle3.WebDownloadString(url);
+                    downloadHandle3.WebDownloadString(url, userAgent);
                 }
                 _updateFunc(false, $"{hashCode}{UIRes.I18N("MsgStartGettingSubscriptions")}");
             }

@@ -184,7 +184,7 @@ namespace v2rayN.Handler
                 pid = _v2rayHandler.LoadV2rayConfigString(_config, _selecteds);
                 if (pid < 0)
                 {
-                    _updateFunc(_selecteds[0], UIRes.I18N("OperationFailed"));
+                    _updateFunc(_selecteds[0].selected, UIRes.I18N("OperationFailed"));
                     return;
                 }
 
@@ -192,24 +192,24 @@ namespace v2rayN.Handler
                 int httpPort = _config.GetLocalPort("speedtest");
                 // 多线程操作
                 List<Task> tasks = new List<Task>();
-                foreach (int itemIndex in _selecteds)
-                {
-                    if (_config.vmess[itemIndex].configType == (int)EConfigType.Custom)
-                    {
+                foreach (var it in _selecteds) {
+                    if (it.configType == (int)EConfigType.Custom) {
                         continue;
                     }
-                    tasks.Add(Task.Run(() =>
-                    {
-                        try
-                        {
-                            WebProxy webProxy = new WebProxy(Global.Loopback, httpPort + itemIndex);
+                    if (it.port <= 0) {
+                        continue;
+                    }
+                    tasks.Add(Task.Run(() => {
+                        try {
+                            WebProxy webProxy = new WebProxy(Global.Loopback, it.port);
                             int responseTime = -1;
-                            string status = GetRealAVGPingTime(_config.speedPingTestUrl, webProxy, out responseTime);
-                            string output = Utils.IsNullOrEmpty(status) ? FormatOut(responseTime, "ms") : FormatOut(status, "");
-                            _updateFunc(itemIndex, output);
+                            string status = GetRealPingTime(_config.constItem.speedPingTestUrl, webProxy, out responseTime);
+                            string output = Utils.IsNullOrEmpty(status) ? FormatOut(responseTime, "ms") : status;
+                            var index = _config.FindIndexId(it.indexId);
+                            if (index < 0) return;
+                            _updateFunc(index, output);
                         }
-                        catch (Exception ex)
-                        {
+                        catch (Exception ex) {
                             Utils.SaveLog(ex.Message, ex);
                         }
                     }));
